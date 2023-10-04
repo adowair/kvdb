@@ -1,7 +1,11 @@
+/*
+Copyright © 2023 Ali Dowair <adoair@umich.edu>
+
+*/
 package main
 
-import "fmt"
+import "github.com/adowair/kvdb/cmd"
 
 func main() {
-	fmt.Println("Hello World!")
+	cmd.Execute()
 }
