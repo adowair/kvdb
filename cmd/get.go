@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/adowair/kvdb/kv"
 	"github.com/spf13/cobra"
 )
 
@@ -12,8 +13,16 @@ var getCmd = &cobra.Command{
 	Short: "Get the value for a key",
 	Long: `Get the value of a key in the database.
 If the key does not exist, an error is returned.`,
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("get called")
+	Args: cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		key := args[0]
+		val, err := kv.Get(key)
+		if err != nil {
+			return err
+		}
+
+		fmt.Printf("Key %s: %s\n", key, val)
+		return nil
 	},
 }
 

@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/adowair/kvdb/kv"
 	"github.com/spf13/cobra"
 )
 
@@ -12,8 +13,15 @@ var delCmd = &cobra.Command{
 	Short: "Delete a key",
 	Long: `Delete a key from the database. This removes the corresponding files
 from the underlying filesystem.`,
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("del called")
+	Args: cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		key := args[0]
+		if err := kv.Delete(key); err != nil {
+			return err
+		}
+
+		fmt.Printf("Deleted %s\n", key)
+		return nil
 	},
 }
 

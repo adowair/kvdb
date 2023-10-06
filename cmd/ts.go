@@ -3,8 +3,11 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/adowair/kvdb/kv"
 	"github.com/spf13/cobra"
 )
+
+const timeFormat = "2006-01-02 15:04:05"
 
 // tsCmd represents the ts command
 var tsCmd = &cobra.Command{
@@ -12,8 +15,18 @@ var tsCmd = &cobra.Command{
 	Short: "Get the created and last-modified timestamps for a key",
 	Long: `Get the times this key was first and last set
 These timestamps are durable--moving a database folder will not affect them.`,
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("ts called")
+	Args: cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		key := args[0]
+		first, last, err := kv.Timestamps(key)
+		if err != nil {
+			return err
+		}
+
+		fmt.Printf("Key %s:\n", key)
+		fmt.Printf("  First set on %s\n", first.Format(timeFormat))
+		fmt.Printf("  Last set on  %s\n", last.Format(timeFormat))
+		return nil
 	},
 }
 

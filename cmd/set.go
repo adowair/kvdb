@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/adowair/kvdb/kv"
 	"github.com/spf13/cobra"
 )
 
@@ -13,8 +14,15 @@ var setCmd = &cobra.Command{
 	Long: `Set the value of a key in the database.
 If the key does not exist, it is created.
 If the key already exists, its old value is overwritten.`,
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("set called")
+	Args: cobra.ExactArgs(2),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		key, val := args[0], args[1]
+		if err := kv.Set(key, val); err != nil {
+			return err
+		}
+
+		fmt.Printf("Set %s <= %s\n", key, val)
+		return nil
 	},
 }
 
