@@ -12,7 +12,7 @@ import (
 
 // testcase runs as a subtest of the top-level test in this file. Each
 // testcase consists of a series of operations to be executed. The returns
-// from each command are compared to some expected values.
+// from each operation are compared to some expected values.
 type testcase struct {
 	name  string
 	steps []step
