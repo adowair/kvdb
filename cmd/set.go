@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/adowair/kvdb/kv"
 	"github.com/spf13/cobra"
@@ -17,7 +18,7 @@ If the key already exists, its old value is overwritten.`,
 	Args: cobra.ExactArgs(2),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		key, val := args[0], args[1]
-		if err := kv.Set(key, val); err != nil {
+		if err := kv.Set(key, val, time.Now()); err != nil {
 			return err
 		}
 
