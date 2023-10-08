@@ -9,6 +9,8 @@ import (
 	"path/filepath"
 	"strconv"
 	"time"
+
+	"github.com/gofrs/flock"
 )
 
 // ErrNotExist is returned when attempting to perform an operation on a key
@@ -41,13 +43,20 @@ func read(key string) (*Entry, error) {
 	return readFrom(path)
 }
 
-// readFrom is an internal function that gets the contents of a file in db, and
-// parses it into an Entry if possible. This function is exposed to be testable
-// and swappable with other implementations in the future.
+// readFrom is an internal function that gets the contents of the file at path,
+// and parses it into an Entry if possible. The function takes an exclusive
+// advisory lock on the file, on which other kvdb instances will block.
 func readFrom(path string) (*Entry, error) {
 	if _, err := os.Stat(path); errors.Is(err, fs.ErrNotExist) {
 		return nil, ErrNotExist
 	} else if err != nil {
+		return nil, err
+	}
+
+	lock := flock.New(path)
+	err := lock.Lock()
+	defer lock.Unlock()
+	if err != nil {
 		return nil, err
 	}
 
@@ -97,9 +106,9 @@ func write(key string, entry *Entry) error {
 	return writeTo(path, entry)
 }
 
-// readFrom is an internal function that serializes an Entry, and then
-// writes it to db in a file named key. This function is exposed to be testable
-// and swappable with other implementations in the future.
+// writeTo is an internal function that serializes an Entry, and then
+// writes it to the given path. The function takes an exclusive
+// advisory lock on the file, on which other kvdb instances will block.
 func writeTo(path string, entry *Entry) error {
 	if len(entry.Value) == 0 {
 		return fmt.Errorf("%w, storing empty \"\" is not allowed", ErrBadFormat)
@@ -112,6 +121,13 @@ func writeTo(path string, entry *Entry) error {
 		entry.LastEdited.Unix(),
 		delimiter,
 		entry.Value)
+
+	lock := flock.New(path)
+	err := lock.Lock()
+	defer lock.Unlock()
+	if err != nil {
+		return err
+	}
 
 	return os.WriteFile(path, []byte(data), os.ModePerm)
 }
@@ -127,7 +143,14 @@ func delete(key string) error {
 }
 
 func deleteFile(path string) error {
-	err := os.Remove(path)
+	lock := flock.New(path)
+	err := lock.Lock()
+	defer lock.Unlock()
+	if err != nil {
+		return err
+	}
+
+	err = os.Remove(path)
 	if errors.Is(err, fs.ErrNotExist) {
 		return nil
 	}
