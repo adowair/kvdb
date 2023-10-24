@@ -37,8 +37,8 @@ Use "kvdb [command] --help" for more information about a command.
 ```
 
 ## Features
-- `kvdb` supports valid utf8 strings not containing path delimiters
-  ('/', '\') as keys and values.
+- `kvdb` supports valid `utf-8` strings not containing path delimiters
+  (`/`, `\`) as keys and values.
 - By design, `kvdb` does not support empty values for keys. This was done to
   reduce confusion. To unset a key, simple delete it.
 - Kvdb operations are atomic. Multiple processes can safely invoke `kvdb` to
