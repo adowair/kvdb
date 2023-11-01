@@ -18,6 +18,6 @@ jobs:
     steps:
       - uses: google-github-actions/release-please-action@v3
         with:
-          release-type: node
+          release-type: go
           package-name: kvdb
-            
+          pull-request-header: Automated Release PR
