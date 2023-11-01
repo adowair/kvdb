@@ -1,0 +1,23 @@
+# This workflow will release the project according to the conventional commit standard
+# For more information see: https://github.com/marketplace/actions/release-please-action
+
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: google-github-actions/release-please-action@v3
+        with:
+          release-type: node
+          package-name: kvdb
+            
